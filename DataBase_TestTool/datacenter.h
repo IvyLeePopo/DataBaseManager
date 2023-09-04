@@ -6,6 +6,19 @@
 
 using namespace std;
 
+enum enDbOperationType
+{
+    connect = 0,
+    disConnected = 1,
+    addData,
+    addMoreData,
+    deleteData,
+    updateData,
+    queryData,
+};
+
+Q_DECLARE_METATYPE(enDbOperationType);
+
 class DataCenter : public QObject
 {
     Q_OBJECT
@@ -13,34 +26,31 @@ class DataCenter : public QObject
 public:
     DataCenter(QObject *parent = nullptr);
 
-    bool connectDB();
-
-    // add
-    bool addData(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
-    bool addMoreData(int count);
-    void setCount(int count){ m_nCount = count; }
-
-    // delete
-    bool DeleteDataById(string strOrderd);
-
-    // update
-    bool UpdateDataById(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
-
-    // query
-    bool getDataById(string strOrderId, string& strEntry, string& strMoney, string& strPlate, string& strType, string& strWeight);
-
-signals:
-    void sigConnectStatus(bool falg);
-    void sigAddMoreDataStatus(bool falg);
-
 
 public slots:
-    bool slotConnectDB();
-    bool slotAddMoreData();
+    // 连接/断开
+    void slotConnectDB();
+    void slotDisconnected();
 
-private:
-    int m_nCount = 0;
+    // 添加
+    void slotAddData(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
+    void slotAddMoreData(int count, int index);
 
+    // 删除
+    void slotDeleteDataById(string strOrderd);
+
+    // 更新
+    void slotUpdateDataById(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
+
+    // 查询
+    void slotGetDataById(string strOrderId);
+
+    //　数据库大小
+    void slotGetDbCount();
+signals:
+    void sigStatus(enDbOperationType type, bool flag);
+    void sigCount(int count);
+    void sigQueryDataById(bool ret, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
 };
 
 #endif // DATACENTER_H

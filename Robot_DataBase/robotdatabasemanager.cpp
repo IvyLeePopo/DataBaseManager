@@ -3,9 +3,6 @@
 
 RobotDataBaseManager *RobotDataBaseManager::self = NULL;
 
-
-int g_Sum = 0;
-
 RobotDataBaseManager::RobotDataBaseManager()
 {
     dbDriver = "QSQLITE";
@@ -18,7 +15,6 @@ RobotDataBaseManager::RobotDataBaseManager()
     m_bConnected = false;
     qDebug() << "Db instance inited...";
 
-    m_bConnected = openDB();
     //LinuxTimerManager::initLinuxTimer(m_deleteTimerId,deleteTimerProc, "RobotDataBaseManager-m_deleteTimerId");
     //LinuxTimerManager::startLinuxTimer(m_deleteTimerId,30,0);
 }
@@ -69,6 +65,12 @@ RobotDataBaseManager* RobotDataBaseManager::instance ()
     }
 
     return self;
+}
+
+bool RobotDataBaseManager::connectDB()
+{
+    m_bConnected = openDB();
+    return m_bConnected;
 }
 
 bool RobotDataBaseManager::disConnectDB()
@@ -140,24 +142,25 @@ bool RobotDataBaseManager::connDB()
                          weight text,                                                                \
                          logtime TIMESTAMP default (datetime('now', 'localtime'))  ) ");
 
-            if (breturn)
+    if (breturn)
     {
-            strlog.clear();
-            strlog = "[数据库订单模块]，建立数据库表成功";
-}
-            else
+        strlog.clear();
+        strlog = "[数据库订单模块]，建立数据库表成功";
+    }
+    else
     {
-            strlog.clear();
-            strlog = "[数据库订单模块]，数据库表已存在";
-}
-            qDebug() << "RobotDataBaseManager::connDB" + strlog;
+        strlog.clear();
+        strlog = "[数据库订单模块]，数据库表已存在";
+    }
+    qDebug() << "RobotDataBaseManager::connDB" + strlog;
 
     return true;
 }
 
 void RobotDataBaseManager::closeDB()
 {
-    if (db.isOpen()) {
+    if (db.isOpen())
+    {
         qDebug() << "------close db------: ";
         db.close();
     }
@@ -171,54 +174,6 @@ bool RobotDataBaseManager::openDB()
 QSqlDatabase RobotDataBaseManager::database()
 {
     return db;
-}
-
-bool RobotDataBaseManager::addData2DB(string id)
-{
-    if (isOrderIdExist(id))
-        return false;
-
-    QString payId = QString::fromStdString(id);
-
-    QSqlQuery query;
-    QString sql = "INSERT INTO orderData (payId) VALUES(:payId);";
-
-    query.prepare(sql);
-    query.bindValue(":payId", payId);
-
-    if (!query.exec())
-    {
-        qDebug()<<tr("订单Id %1 ，加入缓存失败：%2").arg(payId).arg(query.lastError().text());
-        return false;
-    }
-    qDebug()<<tr("[#RobotDataBaseManager::addData2DB#]订单Id %1 已加入缓存").arg(payId);
-
-    return true;
-}
-
-bool RobotDataBaseManager::addData2DB(string id, int type)
-{
-    if (isOrderIdExist(id))
-        return false;
-
-
-    QString payId = QString::fromStdString(id);
-
-    QSqlQuery query;
-    QString sql = "INSERT INTO orderData (payId, type) VALUES (:payId, :type);";
-
-    query.prepare(sql);
-    query.bindValue(":payId", payId);
-    query.bindValue(":type", type);
-
-    if (!query.exec())
-    {
-        qDebug()<<tr("订单Id %1 ，加入缓存失败：%2").arg(payId).arg(query.lastError().text());
-        return false;
-    }
-    qDebug()<<tr("订单Id %1 已加入缓存").arg(payId);
-
-    return true;
 }
 
 bool RobotDataBaseManager::addData2DB(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
@@ -249,10 +204,7 @@ bool RobotDataBaseManager::addData2DB(string strOrderId, string strEntry, string
         qDebug()<<tr("订单Id %1 ，加入缓存失败：%2").arg(orderId).arg(query.lastError().text());
         return false;
     }
-    else
-    {
-        g_Sum++;
-    }
+
     //qDebug()<<tr("订单Id %1 已加入缓存").arg(orderId);
 
     return true;
@@ -397,7 +349,6 @@ int RobotDataBaseManager::countDB()
         count = query.value(0).toInt();
         // 在这里使用count变量
         qDebug() << "从数据表查出的总数Count: " << count;
-        qDebug() << "手动计算的总数g_Sum: " << g_Sum;
     }
 
     return count;

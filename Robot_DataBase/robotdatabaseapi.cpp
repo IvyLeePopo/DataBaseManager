@@ -5,8 +5,7 @@
 bool DB_connect()
 {
     //链接数据库
-    RobotDataBaseManager::instance();
-    return RobotDataBaseManager::instance()->bConnected();
+    return RobotDataBaseManager::instance()->connectDB();
 }
 
 bool DB_disConnect()
@@ -21,9 +20,7 @@ bool DB_addData(string orderId, string entry, string money, string plate, string
 
 bool DB_deleteData(string id)
 {
-    //return RobotDataBaseManager::instance()->DeleteDataById(id);
-
-    return false;
+    return RobotDataBaseManager::instance()->DeleteDataById(id);
 }
 
 bool DB_updateData(string orderId, string entry, string money, string plate, string type, string weight)

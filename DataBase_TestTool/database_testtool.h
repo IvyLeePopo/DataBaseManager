@@ -26,6 +26,14 @@ public:
     ~DataBase_TestTool();
 
 signals:
+    void sigConnect();
+    void sigDisconnected();
+    void sigAddData(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
+    void sigAddMoreData(int count, int index);
+    void sigDeleteDataById(string strOrderd);
+    void sigUpdateDataById(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
+    void sigQueryDataById(string strOrderId);
+    void sigGetDbCount();
 
 private slots:
     void on_btn_connectDB_clicked();
@@ -39,19 +47,14 @@ private slots:
     void on_btn_deleteAll_clicked();
     void on_btn_dbTotalCount_clicked();
 
-
-
 private slots:
-    void slotConnectStatus(bool flag);
-    void slotAddDataStatus(bool flag);
-    void slotAddMoreDataStatus(bool flag);
-
+    void slotGetStatusFromDB(enDbOperationType type, bool flag);
+    void slotGetDbCount(int count);
+    void slotGetQueryDataById(bool ret, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
 
 private:
     void initAddData();
-    void updateDataTabel();
     bool testAddData();
-    void testQueryData();
 
 private:
     Ui::DataBase_TestTool *ui;

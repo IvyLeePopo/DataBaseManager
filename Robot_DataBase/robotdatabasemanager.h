@@ -24,11 +24,11 @@ class RobotDataBaseManager : public QObject
 public:
     static RobotDataBaseManager* instance();
 
+    bool connectDB();
+
     bool disConnectDB();
 
     // add
-    bool addData2DB(string id);
-    bool addData2DB(string id, int type);
     bool addData2DB(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
 
     // delete

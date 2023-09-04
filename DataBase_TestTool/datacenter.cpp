@@ -11,29 +11,26 @@ DataCenter::DataCenter(QObject *parent)
 
 }
 
-bool DataCenter::connectDB()
+void DataCenter::slotConnectDB()
 {
-    return DB_connect();
+    bool ret = DB_connect();
+    emit sigStatus(enDbOperationType::connect, ret);
 }
 
-bool DataCenter::addData(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
+void DataCenter::slotDisconnected()
 {
-    return true;
+    bool ret = DB_disConnect();
+    emit sigStatus(enDbOperationType::disConnected, ret);
 }
 
-bool DataCenter::addMoreData(int count)
+void DataCenter::slotAddData(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE", "Connection1");
-    db.setDatabaseName("trawe.db"); // 数据库文件名
+    bool ret = DB_addData(strOrderId, strEntry, strMoney, strPlate, strType, strWeight);
+    emit sigStatus(enDbOperationType::addData, ret);
+}
 
-    if (!db.open())
-    {
-        qDebug() << "Failed to connect to database 1.";
-        emit sigAddMoreDataStatus(false);
-        return false;
-    }
-
-
+void DataCenter::slotAddMoreData(int count, int index)
+{
     QStringList types;
     types << "客一"<< "客二" << "客三" << "客四" << "货一" << "货二" << "货三" << "货四";
 
@@ -45,7 +42,9 @@ bool DataCenter::addMoreData(int count)
     tagOrderParam tempParam;
 
 
-    for(int index = 1; index < (count +index); ++index)
+    int sum = index + count;
+    bool ret = false;
+    for(; index < sum; ++index)
     {
         tempParam.strOrderID = QString::number(index).toStdString();
 
@@ -56,53 +55,40 @@ bool DataCenter::addMoreData(int count)
         tempParam.strWeight = QString::number(index).toStdString();
 
 
-        bool ret = DB_addData(tempParam.strOrderID, tempParam.strEntry, tempParam.strMoney,
+        ret = DB_addData(tempParam.strOrderID, tempParam.strEntry, tempParam.strMoney,
                               tempParam.strPlate, tempParam.strType, tempParam.strWeight);
 
-        if(ret)
-        {
-            qDebug() << "序号为 (" << index << ") 添加数据成功！";
-        }
-        else
+        if(!ret)
         {
             qDebug() << "添加数据失败！";
             break;
         }
     }
 
-    db.close();
-    emit sigAddMoreDataStatus(true);
-    return true;
+    emit sigStatus(enDbOperationType::addMoreData, ret);
 }
 
-bool DataCenter::DeleteDataById(string strOrderd)
+void DataCenter::slotDeleteDataById(string strOrderd)
 {
-
-    return true;
+    bool ret = DB_deleteData(strOrderd);
+    emit sigStatus(enDbOperationType::deleteData, ret);
 }
 
-bool DataCenter::UpdateDataById(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
+void DataCenter::slotUpdateDataById(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
 {
-
-    return true;
+    bool ret = DB_updateData(strOrderId, strEntry, strMoney, strPlate, strType, strWeight);
+    emit sigStatus(enDbOperationType::updateData, ret);
 }
 
-bool DataCenter::getDataById(string strOrderId, string &strEntry, string &strMoney, string &strPlate, string &strType, string &strWeight)
+void DataCenter::slotGetDataById(string strOrderId)
 {
-
-    return true;
+    tagOrderParam tempParam;
+    bool ret = DB_queryDataById(strOrderId, tempParam.strEntry, tempParam.strMoney, tempParam.strPlate, tempParam.strType, tempParam.strWeight);
+    emit sigQueryDataById(ret, tempParam.strEntry, tempParam.strMoney, tempParam.strPlate, tempParam.strType, tempParam.strWeight);
 }
 
-bool DataCenter::slotConnectDB()
+void DataCenter::slotGetDbCount()
 {
-    bool ret = DB_connect();
-    emit sigConnectStatus(ret);
-
-    return ret;
-}
-
-bool DataCenter::slotAddMoreData()
-{
-    int count = 100;
-    addMoreData(count);
+    int count = DB_totalCount();
+    emit sigCount(count);
 }
