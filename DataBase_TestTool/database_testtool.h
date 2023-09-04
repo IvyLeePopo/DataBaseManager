@@ -53,8 +53,7 @@ private slots:
     void slotGetQueryDataById(bool ret, string strEntry, string strMoney, string strPlate, string strType, string strWeight);
 
 private:
-    void initAddData();
-    bool testAddData();
+    void createOrederId();
 
 private:
     Ui::DataBase_TestTool *ui;

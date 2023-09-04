@@ -67,51 +67,11 @@ void DataBase_TestTool::on_btn_connectDB_clicked()
 
 }
 
-void DataBase_TestTool::initAddData()
+void DataBase_TestTool::createOrederId()
 {
     QUuid id = QUuid::createUuid();
     QString strId = id.toString();
     ui->lineEdit_orderId->setText(strId);
-}
-
-bool DataBase_TestTool::testAddData()
-{
-    QStringList types;
-    types << "客一"<< "客二" << "客三" << "客四" << "货一" << "货二" << "货三" << "货四";
-
-
-    QStringList entrys;
-    entrys << "天河"<< "滘口" << "南沙" << "海珠" << "白云" << "增城" << "荔湾" << "越秀";
-
-
-    int count = ui->lineEdit_count->text().toInt();
-    int index = ui->lineEdit_index->text().toInt();
-
-    tagOrderParam tempParam;
-    int sum = index + count;
-    for(; index < sum; ++index)
-    {
-        tempParam.strOrderID = QString::number(index).toStdString();
-
-        tempParam.strEntry = entrys[index%8].toStdString();
-        tempParam.strMoney = "99";
-        tempParam.strPlate = "粤A777Q1";
-        tempParam.strType = types[index%8].toStdString();
-        tempParam.strWeight = QString::number(index).toStdString();
-
-
-        bool ret = DB_addData(tempParam.strOrderID, tempParam.strEntry, tempParam.strMoney,
-                              tempParam.strPlate, tempParam.strType, tempParam.strWeight);
-
-        if(!ret)
-        {
-            qDebug() << "添加数据失败！";
-            return false;
-        }
-    }
-
-    qDebug() << count << " 条数据，添加成功！";
-    return true;
 }
 
 void DataBase_TestTool::on_btn_add_clicked()
@@ -158,7 +118,7 @@ void DataBase_TestTool::on_btn_showAll_clicked()
         return;
     }
 
-    QSqlTableModel * model = new QSqlTableModel(this,db);
+    QSqlTableModel * model = new QSqlTableModel(this, db);
     model->setTable("orderData");
     ui->tableView->setModel(model);
     model->select();
@@ -210,6 +170,10 @@ void DataBase_TestTool::on_btn_update_clicked()
 
 void DataBase_TestTool::on_btn_queryExec_clicked()
 {
+    qDebug() << __LINE__ << __FUNCTION__ << "暂时屏蔽该功能" ;
+    ui->label_execSqlStatus->setText("该功能不可用");
+    return;
+
     qDebug() << __LINE__ << __FUNCTION__ << "开始执行sql语句:" ;
 
     string sql = ui->textEdit_sql->toPlainText().toStdString();
@@ -240,7 +204,10 @@ void DataBase_TestTool::on_btn_addDataMore_clicked()
 
 void DataBase_TestTool::on_btn_deleteAll_clicked()
 {
+    qDebug() << __LINE__ << __FUNCTION__ << "暂时屏蔽该功能" ;
+    ui->label_deleteAllStatus->setText("该功能不可用");
     return;
+
     qDebug() << __LINE__ << __FUNCTION__ << "开始删除整个表的数据" ;
 
 
@@ -336,7 +303,6 @@ void DataBase_TestTool::slotGetStatusFromDB(enDbOperationType type, bool flag)
         break;
     }
 
-    //on_btn_showAll_clicked();
     qDebug() << strLog;
 }
 
