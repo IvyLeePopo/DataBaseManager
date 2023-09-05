@@ -20,6 +20,7 @@ RobotDataBaseManager::RobotDataBaseManager()
 RobotDataBaseManager::~RobotDataBaseManager()
 {
     closeDB();
+    m_bConnected = false;
     db.removeDatabase(DB_NAME);
 
 }
@@ -166,6 +167,9 @@ QSqlDatabase RobotDataBaseManager::database()
 
 bool RobotDataBaseManager::addData2DB(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
 {
+    if(!bConnected())
+        return false;
+
     if (isOrderIdExist(strOrderId))
         return false;
 
@@ -217,9 +221,6 @@ int RobotDataBaseManager::getTypeById(string id)
     qDebug() << "[数据库]:getTypeById: 开始~~~~~~~~~~~~~~~~~";
 
     int type = 1;
-
-    //    return type;
-
     QString orderId = QString::fromStdString(id);
     QSqlQuery query;
     QString sql = "SELECT type FROM orderData WHERE orderId=:orderId;";
@@ -249,6 +250,9 @@ int RobotDataBaseManager::getTypeById(string id)
 
 bool RobotDataBaseManager::getDataById(string strOrderId, string& strEntry, string& strMoney, string& strPlate, string& strType, string& strWeight)
 {
+    if(!bConnected())
+        return false;
+
     qDebug() << "[数据库]:getDataById 查询所有数据: 开始~~~~~~~~~~~~~~~~~";
 
     QString orderId = QString::fromStdString(strOrderId);
@@ -279,30 +283,15 @@ bool RobotDataBaseManager::getDataById(string strOrderId, string& strEntry, stri
         }
     }
 
-//    query.exec("SELECT * FROM orderData");
-
-//    qDebug() << "[数据库]:SELECT * FROM orderData:";
-
-//    while (query.next())
-//    {
-//        // 读取字段值
-//        QString name = query.value("entry").toString();
-//        QString money = query.value("money").toString();
-//        QString plate = query.value("plate").toString();
-//        QString type = query.value("type").toString();
-//        QString weight = query.value("weight").toString();
-
-//        // 输出结果
-//        qDebug() << "entry:" << name << ", money:" << money << ", plate:" << plate << ", type:" << type << ", weight:" << weight;
-//    }
-
-
     qDebug() << "[数据库]:getDataById 查询所有数据: 结束~~~~~~~~~~~~~~~~~";
     return true;
 }
 
 bool RobotDataBaseManager::queryExec(string strSql)
 {
+    if(!bConnected())
+        return false;
+
     QString sql = QString::fromStdString(strSql);
 
     QSqlQuery query;
@@ -319,7 +308,8 @@ bool RobotDataBaseManager::queryExec(string strSql)
 
 int RobotDataBaseManager::countDB()
 {
-    qDebug() << "[数据库]:countDB 查询所有数据: 开始~~~~~~~~~~~~~~~~~";
+    if(!bConnected())
+        return false;
 
     QSqlQuery query;
     QString sql = "SELECT COUNT(*) FROM orderData;";
@@ -344,6 +334,9 @@ int RobotDataBaseManager::countDB()
 
 bool RobotDataBaseManager::DeleteDataById(string strOrderId)
 {
+    if(!bConnected())
+        return false;
+
     qDebug() << "RobotDataBaseManager::DeleteDataById: " << QString::fromStdString(strOrderId);
 
     QString orderId = QString::fromStdString(strOrderId);
@@ -369,6 +362,9 @@ bool RobotDataBaseManager::DeleteDataById(string strOrderId)
 
 bool RobotDataBaseManager::UpdateDataById(string strOrderId, string strEntry, string strMoney, string strPlate, string strType, string strWeight)
 {
+    if(!bConnected())
+        return false;
+
     if (!isOrderIdExist(strOrderId))
         return false;
 
@@ -433,5 +429,13 @@ bool RobotDataBaseManager::isOrderIdExist(string id)
     }
 
     return false;
+}
+
+bool RobotDataBaseManager::bConnected()
+{
+    if(!m_bConnected)
+        qDebug() << "数据库还没成功连接...";
+
+    return m_bConnected;
 }
 

@@ -52,14 +52,13 @@ public:
 
     QString getCurrentOfCancelPayId();
 
-    bool bConnected() {return m_bConnected;}
-
 private:
     bool connDB();
     void closeDB();
     bool openDB();
     QSqlDatabase database();
     bool isOrderIdExist(string strOrderId);
+    bool bConnected();
 
 private:
     static RobotDataBaseManager *self;
@@ -72,7 +71,6 @@ private:
     QString hostName;
 
     int hostPort;
-
     bool m_bConnected;
 
 private:
@@ -82,7 +80,6 @@ private:
     timer_t m_deleteTimerId;
 
 public :
-
    static  void deleteTimerProc(timer_t data);
 
 public:
