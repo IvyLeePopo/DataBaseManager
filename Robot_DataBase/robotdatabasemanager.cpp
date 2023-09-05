@@ -1,13 +1,11 @@
 #include "robotdatabasemanager.h"
 #define DB_NAME  "qt_sql_default_connection"
 
-RobotDataBaseManager *RobotDataBaseManager::self = NULL;
-
 RobotDataBaseManager::RobotDataBaseManager()
 {
     dbDriver = "QSQLITE";
-    //dbName = "/opt/scaner/lib/trawe.db";
-    dbName = "trawe.db";
+    //dbName = "/opt/scaner/lib/trawe.db";//linux的目录
+    dbName = "trawe.db";//windows的测试目录
     userName = "trawe";
     userPwd = "trawe";
     hostName = "localhost";
@@ -55,16 +53,6 @@ bool RobotDataBaseManager::checkColumnExists2()
         return true;
     }
 
-}
-
-RobotDataBaseManager* RobotDataBaseManager::instance ()
-{
-    if (NULL == self)
-    {
-        self = new RobotDataBaseManager();
-    }
-
-    return self;
 }
 
 bool RobotDataBaseManager::connectDB()

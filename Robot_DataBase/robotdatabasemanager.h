@@ -13,19 +13,22 @@
 
 #include <string>
 #include "LinuxTimerManager.h"
+#include "Singleton.h"
 
 using namespace std;
 
-class RobotDataBaseManager : public QObject
+class RobotDataBaseManager : public QObject, public Singleton<RobotDataBaseManager>
 {
 
     Q_OBJECT
+    friend class Singleton<RobotDataBaseManager>;
 
 public:
-    static RobotDataBaseManager* instance();
+    RobotDataBaseManager();
+    ~RobotDataBaseManager();
 
+    // connect/disconnected
     bool connectDB();
-
     bool disConnectDB();
 
     // add
@@ -52,9 +55,6 @@ public:
     bool bConnected() {return m_bConnected;}
 
 private:
-    RobotDataBaseManager();
-    ~RobotDataBaseManager();
-
     bool connDB();
     void closeDB();
     bool openDB();
